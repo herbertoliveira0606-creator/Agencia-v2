@@ -8,8 +8,8 @@ description: >-
   texto pra virar carrossel — qualquer pedido pontual de carrossel fora da
   rotina automática de News Feed. Faz o trabalho pesado: pesquisa, enquadra,
   escreve a headline, monta a arquitetura narrativa, define direção visual e
-  prepara o render (Higgsfield 3:4 / 2k) ou entrega copy + plano visual quando
-  não há ambiente configurado.
+  prepara o render (geração de imagem em 3:4 + upscale Magnific via MCP de
+  imagem) ou entrega copy + plano visual quando não há ambiente configurado.
 ---
 
 # Criar carrossel (tema ou conteúdo próprio)
@@ -135,7 +135,7 @@ visual → checklist de render.
 
 ## Saída mínima (sem render)
 
-Quando ainda **não** existe setup de marca/Notion/Drive/Higgsfield, entregue
+Quando ainda **não** existe setup de marca/Notion/Drive/Magnific, entregue
 exatamente neste formato — e **não bloqueie** a criação por falta de automação:
 
 ```text
@@ -155,8 +155,9 @@ Direção visual:
 ...
 
 Checklist para render:
-- formato 3:4 via Higgsfield (--aspect_ratio "3:4" + --resolution "2k"),
-  mantendo o PNG original baixado sem normalizar/cortar;
+- formato 3:4 via MCP de imagem (images_generate aspectRatio "3:4"),
+  seguido de upscale Magnific (images_upscale 2x/4x);
+- mantendo o PNG da geração sem normalizar/cortar manualmente;
 - 9 slides;
 - paleta;
 - tipografia;
@@ -168,23 +169,41 @@ Checklist para render:
 
 ---
 
-## Render (quando há ambiente configurado)
+## Render (quando há ambiente configurado) — MCP de imagem + Magnific
 
-- **Formato:** Higgsfield CLI com `--aspect_ratio "3:4"` e `--resolution "2k"`.
-  Entregue o **PNG original baixado** — **não** normalizar, cortar, redimensionar
-  nem converter pra 1080×1350.
-- **Coerência:** gere a **capa** primeiro como referência mestre; suba a capa
-  (sem logo) + refs visuais da marca via `higgsfield upload create` e **passe
-  esses UUIDs (`--image`) em todos os slides internos (2-9)**.
-- **Persistência:** grave `cover-url.txt` **antes** de disparar o batch dos
-  slides 2-9. Nunca confie em variável de bash entre etapas — sempre escreve em
-  arquivo.
-- **Slides internos:** use a capa/refs só pra **estilo** (paleta, tipografia,
-  mood, composição). Conteúdo diferente por slide. **Nunca** copie o layout da
-  capa nem renderize número/contador de página.
-- **Logo:** compositada via Pillow sobre área reservada (capa pequena, slide 9
-  grande, slides do meio sem logo) — **não** desenhada pela IA.
-- **Paralelismo:** slides 2-9 em paralelo (`bash &` + `wait`).
+O render usa o **MCP de imagem**: `images_generate` para gerar e `images_upscale`
+(Magnific) para dar upscale/enhance. Nada de Higgsfield CLI.
+
+1. **Capa primeiro (referência mestre).**
+   `images_generate` com `aspectRatio: "3:4"`, `prompt` = brief visual da capa.
+   Modelo: deixe `mode: "auto"` ou escolha um slug de `images_models_list`
+   (cheque os recomendados). A capa define paleta, tipografia, mood e composição
+   do carrossel inteiro.
+
+2. **Guarde o identifier da capa.**
+   Anote o `creation identifier` retornado **antes** de disparar os slides 2-9.
+   É ele que garante coerência — não confie em estado solto entre etapas.
+
+3. **Slides internos 2-9 com a capa como referência.**
+   Para cada slide, `images_generate` com `aspectRatio: "3:4"` e
+   `references: [{ type: "style", identifier: <id-da-capa> }]` (e refs visuais da
+   marca via `library_*` quando existirem). Use a capa/refs **só pra estilo** —
+   conteúdo diferente por slide. **Nunca** copie o layout da capa nem renderize
+   número/contador de página.
+
+4. **Upscale com Magnific.**
+   `images_upscale` em cada slide aprovado (`scale: "2x"` ou `"4x"`),
+   usando o `creationIdentifier` da geração. Para pixels exatos use
+   `images_resize`; para ajuste de proporção, `images_crop` — mas **não**
+   normalize/corte manualmente sem necessidade.
+
+5. **Logo (composição local).**
+   Compositada via Pillow sobre área reservada (capa pequena, slide 9 grande,
+   slides do meio sem logo) — **não** desenhada pela IA.
+
+6. **Preview.**
+   Em cliente com UI, chame `creations_show` com todos os identifiers pra
+   exibir os slides inline; nunca pare só nos links.
 
 ---
 

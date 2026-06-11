@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Motion Studio — São João das Tradições · Ipubi 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808; --s1:#0f0f0f; --s2:#161616;
+  --border:#242424; --border2:#2e2e2e;
+  --mg:#e8006f; --mg2:#ff2d8a; --mg3:#ff80bb;
+  --text:#f0f0f0; --sub:#888; --dim:#555;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--bg); color:var(--text);
+  min-height:100vh; display:flex; flex-direction:column; align-items:center;
+  padding:28px 16px 50px;
+}
+
+/* HEADER */
+header{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:420px;margin-bottom:18px}
+.brand{font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.08em;font-size:.82rem;text-transform:uppercase;color:var(--text)}
+.brand span{color:var(--mg)}
+.loop-badge{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--mg2);border:1px solid rgba(232,0,111,.3);background:rgba(232,0,111,.08);padding:4px 10px;border-radius:20px;text-transform:uppercase}
+.loop-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--mg)}
+
+/* STAGE */
+.stage{width:100%;max-width:420px}
+.poster-card{
+  position:relative;width:100%;aspect-ratio:4/5;
+  border-radius:16px;overflow:hidden;border:1px solid var(--border2);
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+  background:#000;
+}
+.poster-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 50%;will-change:transform}
+
+/* GLOW OVERLAYS (additive light, no pixel masking) */
+.overlay{position:absolute;pointer-events:none;mix-blend-mode:screen;border-radius:50%;will-change:opacity,transform}
+.flame-soft{left:28%;top:1%;width:46%;height:28%;background:radial-gradient(circle,rgba(255,170,60,.55) 0%,rgba(255,90,20,.25) 50%,transparent 75%);filter:blur(22px)}
+.flame-main{left:36%;top:5%;width:32%;height:20%;background:radial-gradient(circle,rgba(255,224,140,.95) 0%,rgba(255,120,30,.65) 45%,transparent 75%);filter:blur(10px)}
+.title-glow{left:5%;top:0%;width:90%;height:30%;border-radius:24px;background:radial-gradient(ellipse at center,rgba(120,170,255,.35) 0%,transparent 70%);filter:blur(28px)}
+.lantern-glow{left:74%;top:-3%;width:32%;height:28%;background:radial-gradient(circle,rgba(255,221,150,.9) 0%,rgba(255,170,80,.4) 45%,transparent 75%);filter:blur(16px)}
+.corner-flame{left:-6%;top:84%;width:34%;height:24%;background:radial-gradient(circle,rgba(255,200,90,.8) 0%,rgba(255,90,20,.4) 50%,transparent 75%);filter:blur(14px)}
+
+/* EMBERS / SPARKS */
+.embers{position:absolute;inset:0;pointer-events:none}
+.ember{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff6d8 0%,#ffb347 55%,transparent 80%);box-shadow:0 0 6px 2px rgba(255,160,60,.7);opacity:0}
+
+/* INFO */
+.info{width:100%;max-width:420px;margin-top:20px}
+.info h1{font-size:1rem;font-weight:600}
+.info h1 span{color:var(--sub);font-weight:400}
+.info p{font-size:.78rem;color:var(--sub);margin-top:6px;line-height:1.6}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:.62rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-family:'Space Mono',monospace;background:rgba(232,0,111,.08);color:var(--mg3);border:1px solid rgba(232,0,111,.2)}
+.btn{margin-top:16px;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:7px;border:1px solid var(--border);background:var(--s2);color:var(--sub);font-family:'Space Grotesk',sans-serif;font-size:.8rem;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--mg);color:var(--mg2)}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">Motion<span>Studio</span></div>
+    <div class="loop-badge"><span class="dot"></span> Loop</div>
+  </header>
+
+  <div class="stage">
+    <div class="poster-card" id="card">
+      <img src="assets/sao-joao-ipubi-2026.jpg" class="poster-img" id="posterImg" alt="São João das Tradições — Ipubi 2026">
+      <div class="overlay flame-soft" id="flameSoft"></div>
+      <div class="overlay flame-main" id="flameMain"></div>
+      <div class="overlay title-glow" id="titleGlow"></div>
+      <div class="overlay lantern-glow" id="lanternGlow"></div>
+      <div class="overlay corner-flame" id="cornerFlame"></div>
+      <div class="embers" id="embersTitle"></div>
+      <div class="embers" id="embersCorner"></div>
+    </div>
+  </div>
+
+  <div class="info">
+    <h1>São João das Tradições <span>· Ipubi 2026</span></h1>
+    <p>Preview de motion graphics gerado com a biblioteca <strong>Motion</strong> a partir da arte estática enviada — chamas, lampião e faíscas ganham vida em loop, mantendo fotos e textos nítidos.</p>
+    <div class="tags">
+      <span class="tag">Chamas animadas</span>
+      <span class="tag">Lampião pulsante</span>
+      <span class="tag">Faíscas subindo</span>
+      <span class="tag">Zoom suave (Ken Burns)</span>
+      <span class="tag">Brilho do título</span>
+    </div>
+    <button class="btn" id="toggleBtn">⏸ Pausar animação</button>
+  </div>
+
+<script type="module">
+import { animate } from "https://cdn.jsdelivr.net/npm/motion@11/+esm";
+
+const controls = [];
+function loop(target, keyframes, options) {
+  controls.push(animate(target, keyframes, { repeat: Infinity, ...options }));
+}
+
+/* Ken Burns — zoom suave em todo o poster */
+loop('#posterImg', { scale: [1, 1.045, 1] }, { duration: 18, ease: 'easeInOut' });
+
+/* Chamas tremulando (camadas em velocidades diferentes p/ flicker orgânico) */
+loop('#flameMain',
+  { opacity: [0.6, 1, 0.65, 0.95, 0.55, 0.9, 0.6], scale: [1, 1.1, 0.92, 1.06, 0.95, 1.04, 1] },
+  { duration: 2.2, ease: 'easeInOut' });
+
+loop('#flameSoft',
+  { opacity: [0.35, 0.6, 0.4, 0.55, 0.35], scale: [1, 1.08, 0.96, 1.05, 1] },
+  { duration: 3.1, ease: 'easeInOut' });
+
+loop('#cornerFlame',
+  { opacity: [0.45, 0.8, 0.5, 0.7, 0.45], scale: [1, 1.07, 0.94, 1.05, 1] },
+  { duration: 2.6, ease: 'easeInOut' });
+
+/* Lampião pulsando */
+loop('#lanternGlow',
+  { opacity: [0.35, 0.65, 0.4, 0.55, 0.35], scale: [1, 1.06, 1, 1.04, 1] },
+  { duration: 3.6, ease: 'easeInOut' });
+
+/* Brilho ambiente atrás do título */
+loop('#titleGlow', { opacity: [0.25, 0.5, 0.25] }, { duration: 5, ease: 'easeInOut' });
+
+/* Faíscas subindo a partir das chamas */
+function spawnEmbers(containerId, zone, count) {
+  const container = document.getElementById(containerId);
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'ember';
+    const size = 3 + Math.random() * 4;
+    el.style.left = (zone.left + Math.random() * zone.width) + '%';
+    el.style.top = (zone.top + Math.random() * zone.height) + '%';
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    container.appendChild(el);
+
+    const drift = (Math.random() - 0.5) * 60;
+    const rise = 90 + Math.random() * 130;
+    const dur = 2.5 + Math.random() * 2.5;
+    const delay = Math.random() * dur;
+
+    controls.push(animate(el,
+      { opacity: [0, 1, 1, 0], y: [0, -rise], x: [0, drift], scale: [0.6, 1, 1, 0.4] },
+      { duration: dur, repeat: Infinity, ease: 'easeOut', delay }));
+  }
+}
+spawnEmbers('embersTitle', { left: 38, top: 6, width: 26, height: 14 }, 8);
+spawnEmbers('embersCorner', { left: 0, top: 86, width: 26, height: 10 }, 6);
+
+/* Entrada do card */
+animate('#card', { opacity: [0, 1], scale: [0.97, 1] }, { duration: 0.7, ease: 'easeOut' });
+
+/* Play / Pause */
+let playing = true;
+document.getElementById('toggleBtn').addEventListener('click', (e) => {
+  playing = !playing;
+  controls.forEach(c => playing ? c.play() : c.pause());
+  e.target.textContent = playing ? '⏸ Pausar animação' : '▶ Reproduzir';
+});
+</script>
+</body>
+</html>
